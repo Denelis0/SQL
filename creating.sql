@@ -1,6 +1,6 @@
 CREATE SCHEMA wt;
 
-CREATE TABLE(
+CREATE TABLE olimb(
 city text,
 edition integer,
 sport text,
