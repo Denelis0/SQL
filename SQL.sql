@@ -199,3 +199,45 @@ UNION
 SELECT country
 FROM employees
 
+ПОДЗАПРОСЫ:
+
+SELECT company_name, contact_name
+FROM customers
+WHERE EXISTS (SELECT customer_id FROM orders
+              WHERE customer_id=customers.customer_id AND
+              freight BETWEEN 50 AND 100);
+			  
+//SQL берет первую строку из таблицы customers
+//Опустим, это клиент ALFKI.
+//В этот момент для базы данных customers.customer_id становится равным 'ALFKI'
+//Там написано условие:
+//WHERE customer_id = customers.customer_id
+//База данных подставляет текущее значение 'ALFKI' в это условие
+//WHERE customer_id = 'ALFKI'  
+//Она ищет заказы именно для ALFKI. Нашла? Допустим, Да
+//Значит, EXISTS возвращает TRUE. Клиент ALFKI попадает в результат
+//SQL возвращается к внешней таблице и берет вторую строку
+
+SELECT DISTINCT company_name
+FROM customers
+WHERE customer_id = ANY(SELECT customer_id FROM orders
+                        JOIN order_details USING(order_id)
+                        WHERE quantity > 40);
+//Сначала база данных находит список ID клиентов, у которых были крупные заказы. Результат — список чисел, например: {ID_1, ID_5, ID_99}
+//ANY (Любой): Условие WHERE customer_id = ANY(...) читается так:
+//"Возьми клиента, посмотри на его ID. Если этот ID равен любому из чисел в полученном списке, то покажи этого клиента"
+//Смысл: Это полный аналог оператора IN (...)
+//= ANY (...) — это то же самое, что IN (...)
+
+SELECT DISTINCT product_name, quantity
+FROM products
+JOIN order_details USING(product_id)
+WHERE quantity > ALL (SELECT AVG(quantity)
+                      FROM order_details
+                      GROUP BY product_id)
+ORDER BY quantity;
+SELECT AVG(quantity) ... GROUP BY product_id
+//Он возвращает не одно число, а список средних значений для каждого продукта отдельно
+//Оператор > ALL (...):
+//Это условие означает: "Значение должно быть больше, чем КАЖДОЕ число из этого списка"
+//Если список [10, 2, 50], то чтобы пройти проверку > ALL, твое количество должно быть больше 50
