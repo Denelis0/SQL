@@ -1,6 +1,6 @@
 create table publisher
 (
-	publisher_id integer primary key, //Уникальный идентификатор каждой строчки в таблице. Не может быть null, должен быть UNIQUE, только один в таблицы (хотя может быть из нескольких полей)
+	publisher_id integer primary key, //Уникальный идентификатор каждой строчки в таблице. Не может быть null, должен быть UNIQUE, только один в таблицы (хотя может быть из нескольких полей). Можно писать и UNIQUE NOT NULL
 	org_name varchar(128) not null,
 	address text not null
 );
@@ -39,7 +39,7 @@ values
 (4, 'Simon & Schuster', 'Chicago');
 
 
----------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
 //Отношение "один к одному"
 Create table person
 (
@@ -240,4 +240,76 @@ SELECT AVG(quantity) ... GROUP BY product_id
 //Он возвращает не одно число, а список средних значений для каждого продукта отдельно
 //Оператор > ALL (...):
 //Это условие означает: "Значение должно быть больше, чем КАЖДОЕ число из этого списка"
+
 //Если список [10, 2, 50], то чтобы пройти проверку > ALL, твое количество должно быть больше 50
+
+------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE student
+(
+	student_id serial,
+	first_name varchar,
+	last_name varchar,
+	birthday date,
+	phone varchar
+);
+
+CREATE TABLE cathedra
+(
+	cathedra_id serial,
+	cathedra_name varchar,
+	dean varchar
+);
+
+ALTER TABLE student
+ADD COLUMN middle_name varchar;
+
+ALTER TABLE student
+ADD COLUMN rating float;
+
+ALTER TABLE student
+ADD COLUMN enrolled date;
+
+ALTER TABLE student 
+DROP COLUMN middle_name;
+
+ALTER TABLE cathedra 
+RENAME TO chair; //Поменять имя таблицы
+
+ALTER TABLE chair 
+RENAME cathedra_id TO chair_id; //Поменять имя столбца
+
+ALTER TABLE chair
+RENAME cathedra_name TO chair_name;
+
+ALTER TABLE student
+ALTER COLUMN first_name SET DATA TYPE varchar(64); //Поменять тип данных у столбца
+
+ALTER TABLE student
+ALTER COLUMN last_name SET DATA TYPE varchar(64);
+
+ALTER TABLE student
+ALTER COLUMN phone SET DATA TYPE varchar(30);
+
+CREATE TABLE faculty
+(
+	faculty_id serial,
+	faculty_name varchar
+);
+
+INSERT INTO faculty (faculty_name varchar) //чтоб скипнуть faculty_id
+VALUES
+('faculty1'),
+('faculty2'),
+('faculty3');
+
+SELECT * FROM faculty;
+
+TRUNCATE TABLE faculty RESTART IDENTITY; //Чтоб сбросить счетчик faculty_id (из-за serial он сам нумеруется)
+
+DROP TABLE faculty;
+
+ALTER TABLE chair
+ADD PRIMARY KEY(chair_id); //Добавить уникальный ключ
+	
+ALTER TABLE chair
+DROP CONSTRAINT chair_cathedra_id_key //Удалить ключ через название
